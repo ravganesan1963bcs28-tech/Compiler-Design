@@ -1,0 +1,87 @@
+[24bcs052@mepcolinux compiler]$cat index.html
+<html>
+<body>
+    <p>Welcome to our site. Visit <a href="https://google.com">Google Search Engine</a> for information.</p>
+    <div>Click here to look at <a href="https://github.com">GitHub Repository</a> layouts.</div>
+</body>
+</html>
+[24bcs052@mepcolinux compiler]$cat html.l
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+// Flags to keep track of when we are inside an anchor text block
+int inside_a = 0;
+%}
+
+%%
+
+[aA][ \t]+[hH][rR][eE][fF]=[ \t]*\"[^\"]*\" {
+    /* Matches <a href="url"> or <A HREF="url"> */
+    char *url_start = strchr(yytext, '"') + 1;
+    char *url_end = strrchr(yytext, '"');
+
+    printf("URL: ");
+    while(url_start < url_end) {
+        putchar(*url_start);
+        url_start++;
+    }
+    printf("\n");
+
+    // Set flag indicating we are entering the anchor text area
+    inside_a = 1;
+    printf("Text: ");
+}
+
+">" {
+    /* Ignore the closing bracket of the opening tag */
+}
+
+"</"[aA]">" {
+    /* Matches </a> or </A> */
+    if (inside_a) {
+        printf("\n-------------------------\n");
+        inside_a = 0;
+    }
+}
+
+.|\n {
+    /* If we are inside the anchor tag, print the characters as the visible text */
+    if (inside_a) {
+        putchar(yytext[0]);
+    }
+}
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file;
+    } else {
+        printf("Error: Please provide an input HTML file.\n");
+        printf("Usage: ./html_extract <file.html>\n");
+        return 1;
+    }
+
+    yylex();
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$flex html.l
+[24bcs052@mepcolinux compiler]$gcc lex.yy.c -lfl -o html_extract
+[24bcs052@mepcolinux compiler]$./html_extract index.html
+URL: https://google.com
+Text: Google Search Engine
+-------------------------
+URL: https://github.com
+Text: GitHub Repository
+-------------------------
