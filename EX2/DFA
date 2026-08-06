@@ -1,0 +1,187 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h> 
+
+#define MAX_STATES 100
+#define MAX_SYMS 20
+#define MAX_NAME_LEN 50 
+
+int n_states = 0;
+char states[MAX_STATES][MAX_NAME_LEN]; 
+
+int n_syms = 0;
+char syms[MAX_SYMS]; 
+
+int n_fin = 0;
+int is_accepting[MAX_STATES] = {0}; 
+
+int matrix[MAX_STATES][MAX_SYMS]; 
+
+void init_matrix() {
+for (int i = 0; i < MAX_STATES; i++) {
+for (int j = 0; j < MAX_SYMS; j++) {
+matrix[i][j] = -1;
+}
+}
+} 
+
+int find_state(const char* name) {
+for (int i = 0; i < n_states; i++) {
+if (strcmp(states[i], name) == 0) return i;
+}
+return -1;
+} 
+
+int find_symbol(char c) {
+for (int i = 0; i < n_syms; i++) {
+if (syms[i] == c) return i;
+}
+return -1;
+} 
+
+int main() {
+init_matrix(); 
+
+printf("--- ENTER AUTOMATON SPECIFICATIONS ---\n");
+
+printf("Enter number of states: ");
+if (scanf("%d", &n_states) != 1 || n_states > MAX_STATES || n_states <= 0) {
+printf("Invalid number of states (Max %d).\n", MAX_STATES);
+return 1;
+}
+
+printf("Enter names for the %d states (separated by space/newline): ", n_states);
+for (int i = 0; i < n_states; i++) {
+if (scanf("%49s", states[i]) != 1) return 1;
+}
+
+printf("Enter number of symbols in alphabet: ");
+if (scanf("%d", &n_syms) != 1 || n_syms > MAX_SYMS || n_syms <= 0) {
+printf("Invalid number of symbols (Max %d).\n", MAX_SYMS);
+return 1;
+}
+
+printf("Enter the %d alphabet symbols: ", n_syms);
+for (int i = 0; i < n_syms; i++) {
+if (scanf(" %c", &syms[i]) != 1) return 1;
+}
+
+printf("Enter number of final/accepting states: ");
+if (scanf("%d", &n_fin) != 1 || n_fin > n_states) {
+printf("Invalid number of final states.\n");
+return 1;
+}
+
+printf("Enter the final states (by name or index): ");
+for (int i = 0; i < n_fin; i++) {
+char token[MAX_NAME_LEN];
+if (scanf("%49s", token) != 1) return 1;
+int idx = find_state(token);
+if (idx != -1) {
+    is_accepting[idx] = 1;
+} else {
+    int num_idx = atoi(token);
+    if (num_idx >= 0 && num_idx < n_states) {
+        is_accepting[num_idx] = 1;
+    } else {
+        printf("Warning: State '%s' not recognized.\n", token);
+    }
+}
+
+}
+
+printf("\nEnter transition matrix mapping:\n");
+for (int i = 0; i < n_states; i++) {
+printf("For state %s, enter next state index/name for symbols ", states[i]);
+for(int j = 0; j < n_syms; j++) printf("'%c' ", syms[j]);
+printf(":\n");
+for (int j = 0; j < n_syms; j++) {
+    char token[MAX_NAME_LEN];
+    if (scanf("%49s", token) != 1) return 1;
+
+    int target_idx = find_state(token);
+    if (target_idx != -1) {
+        matrix[i][j] = target_idx;
+    } else {
+        int raw_val = atoi(token);
+        if (raw_val >= 0 && raw_val < n_states) {
+            matrix[i][j] = raw_val;
+        } else {
+            matrix[i][j] = -1; 
+        }
+    }
+}
+
+}
+
+printf("\n--- PARSED DFA STRUCTURE ---\n");
+printf("States count: %d\n", n_states);
+printf("Symbols count: %d\n", n_syms);
+printf("Legend: '>' = Start State, '*' = Accepting State\n");
+
+printf("\nTransition Matrix Layout:\n%-14s", "State");
+for(int j = 0; j < n_syms; j++) {
+printf("%-12c", syms[j]);
+}
+printf("\n");
+
+for (int i = 0; i < n_states; i++) {
+char state_label[MAX_NAME_LEN + 4];
+char prefix[3] = "  ";
+if (i == 0) prefix[0] = '>';
+if (is_accepting[i] == 1) prefix[1] = '*';
+snprintf(state_label, sizeof(state_label), "%s%s", prefix, states[i]);
+printf("%-14s", state_label);
+
+for (int j = 0; j < n_syms; j++) {
+    if (matrix[i][j] != -1) {
+        printf("%-12s", states[matrix[i][j]]);
+    } else {
+        printf("%-12s", "-");
+    }
+}
+printf("\n");
+
+}
+
+char input_string[256];
+printf("\n===================================\n");
+printf("Enter a string to simulate (or 'exit' to quit):\n");
+
+while (scanf("%255s", input_string) == 1) {
+if (strcmp(input_string, "exit") == 0) break;
+int current_state = 0; 
+int dead_end = 0;
+
+for (int i = 0; input_string[i] != '\0'; i++) {
+    int current_sym_idx = find_symbol(input_string[i]);
+
+    if (current_sym_idx == -1) {
+        printf("Error: Character '%c' is not in the alphabet.\n", input_string[i]);
+        dead_end = 1;
+        break;
+    }
+
+    int next_state = matrix[current_state][current_sym_idx];
+    if (next_state == -1) {
+        printf("Rejected: No transition from state %s on '%c'.\n", states[current_state], input_string[i]);
+        dead_end = 1;
+        break;
+    }
+    current_state = next_state;
+}
+
+if (!dead_end) {
+    if (is_accepting[current_state]) {
+        printf("Result: ACCEPTED (Ended in accepting state %s)\n", states[current_state]);
+    } else {
+        printf("Result: REJECTED (Ended in non-accepting state %s)\n", states[current_state]);
+    }
+}
+printf("\nEnter another string (or 'exit'):\n");
+
+}
+
+return 0;
+
+}
