@@ -1,0 +1,75 @@
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+int count = 0;
+
+/* Helper function to check if a character is a word separator */
+int is_separator(char c) {
+    return (c == '\0' || isspace((unsigned char)c) || ispunct((unsigned char)c));
+}
+%}
+
+%%
+
+is {
+    /*
+       yycharat() or looking ahead/behind isn't always portable in old lex,
+       but we can use standard tracking or safely match 'is' and handle contexts.
+       To stay universally compatible with old lex, we match standard word segments.
+    */
+    REJECT; /* Let a broader pattern match it if this structural check is complex */
+}
+
+[a-zA-Z]+ {
+    /* Match any full word block to easily isolate "is" from "this" or "island" */
+    if (strcmp(yytext, "is") == 0) {
+        count++;
+        printf("was");
+    } else {
+        printf("%s", yytext);
+    }
+}
+
+.|\n {
+    printf("%s", yytext);
+}
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file;
+    } else {
+        printf("Error: Please provide an input text file.\n");
+        printf("Usage: ./replace <input.txt>\n");
+        return 1;
+    }
+
+    yylex();
+
+    fprintf(stderr, "\n--- Total occurrences of 'is' replaced: %d ---\n", count);
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$cat input.txt
+This is a computer. He is a student. This island is beautiful.
+
+[24bcs052@mepcolinux compiler]$flex is.l
+[24bcs052@mepcolinux compiler]$./is input.txt
+This was a computer. He was a student. This island was beautiful.
+
+--- Total occurrences of 'is' replaced: 3 ---
+
+
