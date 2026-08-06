@@ -1,0 +1,207 @@
+[24bcs052@mepcolinux compiler]$cat ex1.prn
+Script started on Thu Aug  6 11:29:38 2026
+[24bcs052@mepcolinux compiler]$cat is.l
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+int count = 0;
+
+/* Helper function to check if a character is a word separator */
+int is_separator(char c) {
+    return (c == '\0' || isspace((unsigned char)c) || ispunct((unsigned char)c));
+}
+%}
+
+%%
+
+is {
+    /*
+       yycharat() or looking ahead/behind isn't always portable in old lex,
+       but we can use standard tracking or safely match 'is' and handle contexts.
+       To stay universally compatible with old lex, we match standard word segments.
+    */
+    REJECT; /* Let a broader pattern match it if this structural check is complex */
+}
+
+[a-zA-Z]+ {
+    /* Match any full word block to easily isolate "is" from "this" or "island" */
+    if (strcmp(yytext, "is") == 0) {
+        count++;
+        printf("was");
+    } else {
+        printf("%s", yytext);
+    }
+}
+
+.|\n {
+    printf("%s", yytext);
+}
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file;
+    } else {
+        printf("Error: Please provide an input text file.\n");
+        printf("Usage: ./replace <input.txt>\n");
+        return 1;
+    }
+
+    yylex();
+
+    fprintf(stderr, "\n--- Total occurrences of 'is' replaced: %d ---\n", count);
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$cat input.txt
+This is a computer. He is a student. This island is beautiful.
+
+[24bcs052@mepcolinux compiler]$flex is.l
+[24bcs052@mepcolinux compiler]$./is input.txt
+This was a computer. He was a student. This island was beautiful.
+
+
+--- Total occurrences of 'is' replaced: 3 ---
+[24bcs052@mepcolinux compiler]$cat index.html
+<html>
+<body>
+    <p>Welcome to our site. Visit <a href="https://google.com">Google Search Engine</a> for information.</p>
+    <div>Click here to look at <a href="https://github.com">GitHub Repository</a> layouts.</div>
+</body>
+</html>
+[24bcs052@mepcolinux compiler]$./html_extract index.html
+URL: https://google.com
+Text: Google Search Engine
+-------------------------
+URL: https://github.com
+Text: GitHub Repository
+-------------------------
+[24bcs052@mepcolinux compiler]$cat pass.l
+%{
+#include <stdio.h>
+#include <string.h>
+
+int has_upper = 0;
+int has_lower = 0;
+int has_special = 0;
+int total_len = 0;
+int starts_with_alpha = 0;
+%}
+
+%%
+
+^([a-zA-Z])[a-zA-Z0-9!@#$%^&*()_+=\-[\]{}|;':",./<>?]* {
+    int i;
+    total_len = yyleng;
+    starts_with_alpha = 1;
+
+    for(i = 0; i < yyleng; i++) {
+        if(yytext[i] >= 'A' && yytext[i] <= 'Z') has_upper = 1;
+        else if(yytext[i] >= 'a' && yytext[i] <= 'z') has_lower = 1;
+        else if(yytext[i] >= '0' && yytext[i] <= '9') { /* numbers allowed but not required */ }
+        else has_special = 1;
+    }
+}
+
+\n {
+    if (starts_with_alpha && total_len > 8 && total_len < 64 && has_upper && has_lower && has_special) {
+        printf("Valid Password\n");
+    } else {
+        printf("Invalid Password\n");
+        if (total_len <= 8 || total_len >= 64) printf("- Length must be > 8 and < 64 characters (Current: %d)\n", total_len);
+        if (!starts_with_alpha) printf("- Must start with an alphabet\n");
+        if (!has_upper) printf("- Missing an uppercase letter\n");
+        if (!has_lower) printf("- Missing a lowercase letter\n");
+        if (!has_special) printf("- Missing a special character\n");
+    }
+
+    // Reset counters for the next line of input
+    has_upper = has_lower = has_special = total_len = starts_with_alpha = 0;
+    printf("\nEnter password to validate: ");
+}
+
+. { /* Ignore characters that don't match the valid pattern sequence */ }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main() {
+    printf("Enter password to validate: ");
+    yylex();
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$./pass
+Enter password to validate: arthurmorgan77D2@
+Valid Password
+
+Enter password to validate: OPeratingsystem
+Invalid Password
+- Missing a special character
+
+[24bcs052@mepcolinux compiler]$cat s.l
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%%
+
+[0-9][0-9][a-zA-Z][a-zA-Z][a-zA-Z][0-9][0-9][0-9] {
+    printf("Extracted Roll No: %s\n", yytext);
+}
+
+.|\n { /* Ignore everything else */ }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        /* Changed argv to argv[1] here */
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file;
+    } else {
+        printf("Error: Please provide an input text file.\n");
+        printf("Usage: ./extract <student.txt>\n");
+        return 1;
+    }
+
+    yylex();
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$cat student.txt
+Ramesh Kumar with roll number 24bcs052 is in the lab.
+Suresh Raina (24bcs011) submitted the assignment.
+The next student is 24bcs105.
+[24bcs052@mepcolinux compiler]$./s student.txt
+Extracted Roll No: 24bcs052
+Extracted Roll No: 24bcs011
+Extracted Roll No: 24bcs105
+[24bcs052@mepcolinux compiler]$exit
+exit
+
+Script done on Thu Aug  6 11:41:00 2026
