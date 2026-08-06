@@ -1,0 +1,49 @@
+
+[24bcs052@mepcolinux compiler]$cat s.l
+%{
+#include <stdio.h>
+#include <stdlib.h>
+%}
+
+%%
+
+[0-9][0-9][a-zA-Z][a-zA-Z][a-zA-Z][0-9][0-9][0-9] {
+    printf("Extracted Roll No: %s\n", yytext);
+}
+
+.|\n { /* Ignore everything else */ }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc > 1) {
+        /* Changed argv to argv[1] here */
+        FILE *file = fopen(argv[1], "r");
+        if (!file) {
+            fprintf(stderr, "Error: Could not open file %s\n", argv[1]);
+            return 1;
+        }
+        yyin = file;
+    } else {
+        printf("Error: Please provide an input text file.\n");
+        printf("Usage: ./extract <student.txt>\n");
+        return 1;
+    }
+
+    yylex();
+    return 0;
+}
+
+[24bcs052@mepcolinux compiler]$cat student.txt
+Ramesh Kumar with roll number 24bcs052 is in the lab.
+Suresh Raina (24bcs011) submitted the assignment.
+The next student is 24bcs105.
+
+[24bcs052@mepcolinux compiler]$./s student.txt
+Extracted Roll No: 24bcs052
+Extracted Roll No: 24bcs011
+Extracted Roll No: 24bcs105
