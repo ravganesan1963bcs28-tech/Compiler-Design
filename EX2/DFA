@@ -190,3 +190,45 @@ int main() {
 
     return 0;
 }
+--- ENTER AUTOMATON SPECIFICATIONS ---
+Enter number of states: 3
+Enter names for the 3 states (separated by space/newline): q0 q1 q2
+Enter number of symbols in alphabet: 2
+Enter the 2 alphabet symbols: 0 1
+Enter number of final/accepting states: 1
+Enter the final states (by name or index): q1
+
+Enter transition matrix mapping:
+For state q0, enter next state index/name for symbols '0' '1' :
+q0 q1
+For state q1, enter next state index/name for symbols '0' '1' :
+q0 q1
+For state q2, enter next state index/name for symbols '0' '1' :
+q2 q2
+
+--- PARSED DFA STRUCTURE ---
+States count: 3
+Symbols count: 2
+Legend: '>' = Start State, '*' = Accepting State
+
+Transition Matrix Layout:
+State         0           1
+> q0          q0          q1
+ *q1          q0          q1
+  q2          q2          q2
+
+===================================
+Enter a string to simulate (or 'exit' to quit):
+0101
+Result: ACCEPTED (Ended in accepting state q1)
+
+Enter another string (or 'exit'):
+1010
+Result: REJECTED (Ended in non-accepting state q0)
+
+Enter another string (or 'exit'):
+1111
+Result: ACCEPTED (Ended in accepting state q1)
+
+Enter another string (or 'exit'):
+exit
