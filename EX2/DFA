@@ -253,3 +253,33 @@ Recognized token   : <01, q1>
  
  
 === Code Execution Successful === this op
+=== DFA LEXER === 
+ 
+No. of states: 3 
+State names: q0 q1 q2 
+No. of symbols: 2 
+Symbol names: 0 1 
+Start state: q0 
+No. of accepting states: 1 
+Accepting states: q1 
+ 
+Transition table: 
+q0 q1 
+q2 q2 
+q2 q2 
+ 
+DFA ready! 
+ 
+1. Test  2. Exit: 1 
+Input: 01101 
+ 
+--- Scanning "01101" --- 
+Recognized token   : <01, q1> 
+Recognized token   : <1, q1> 
+Recognized token   : <01, q1> 
+ 
+1. Test  2. Exit: 2 
+ 
+ 
+=== Code Execution Successful ===
+
