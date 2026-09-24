@@ -183,59 +183,156 @@ int yywrap()
 [24bcs052@mepcolinux compiler]$cd ex3
 [24bcs052@mepcolinux ex3]$gcc lex.yy.c -o scanner
 [24bcs052@mepcolinux ex3]$./scanner
---- OPERATOR ANALYSIS SUMMARY ---
+=== COMPLETE TRANSLATION COMPILER ANALYTICS ===
+
+Variables Found:
+  - [VARIABLE] marks
+  - [VARIABLE] age
+  - [VARIABLE] status
+  - [VARIABLE] marks
+  - [VARIABLE] age
+  - [VARIABLE] status
+  - [VARIABLE] fibo
+  - [VARIABLE] fibo
+  - [VARIABLE] i
+  - [VARIABLE] fibo
+  - [VARIABLE] i
+  - [VARIABLE] fibo
+  - [VARIABLE] i
+  - [VARIABLE] fibo
+  - [VARIABLE] i
+  - [VARIABLE] count
+  - [VARIABLE] rem
+  - [VARIABLE] num
+  - [VARIABLE] rev
+  - [VARIABLE] rev
+  - [VARIABLE] rem
+  - [VARIABLE] num
+  - [VARIABLE] mask
+  - [VARIABLE] flags
+  - [VARIABLE] bits
+  - [VARIABLE] value
+  - [VARIABLE] status
+  - [VARIABLE] shifted
+  - [VARIABLE] mask
+  - [VARIABLE] a
+  - [VARIABLE] b
+  - [VARIABLE] c
+  - [VARIABLE] d
+  - [VARIABLE] e
+  - [VARIABLE] f
+  - [VARIABLE] g
+  - [VARIABLE] h
+  - [VARIABLE] i
+  - [VARIABLE] j
+  - [VARIABLE] sign_check
+  - [VARIABLE] power
+  - [VARIABLE] base
+  - [VARIABLE] exp
+  - [VARIABLE] result
+  - [VARIABLE] rev
+  - [VARIABLE] original
+  - [VARIABLE] limit
+
+Parentheses Found:
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+  - [PARENTHESIS] (
+  - [PARENTHESIS] )
+
+Commas Found:
+  (No commas detected)
+
+Newline Identifications:
+  - [NEWLINE] Marker instance #1
+  - [NEWLINE] Marker instance #2
+  - [NEWLINE] Marker instance #3
+  - [NEWLINE] Marker instance #4
+  - [NEWLINE] Marker instance #5
+  - [NEWLINE] Marker instance #6
+  - [NEWLINE] Marker instance #7
+  - [NEWLINE] Marker instance #8
+  - [NEWLINE] Marker instance #9
+  - [NEWLINE] Marker instance #10
+  - [NEWLINE] Marker instance #11
+  - [NEWLINE] Marker instance #12
+  - [NEWLINE] Marker instance #13
+  - [NEWLINE] Marker instance #14
+  - [NEWLINE] Marker instance #15
+  - [NEWLINE] Marker instance #16
+  - [NEWLINE] Marker instance #17
+  - [NEWLINE] Marker instance #18
+  - [NEWLINE] Marker instance #19
+  - [NEWLINE] Marker instance #20
+  - [NEWLINE] Marker instance #21
+  - [NEWLINE] Marker instance #22
+  - [NEWLINE] Marker instance #23
+  - [NEWLINE] Marker instance #24
+  - [NEWLINE] Marker instance #25
+  - [NEWLINE] Marker instance #26
+  - [NEWLINE] Marker instance #27
+  - [NEWLINE] Marker instance #28
 
 Unary Operators:
-  - [Line 5] Logical NOT: !
-  - [Line 11] Pre Increment: ++
-  - [Line 13] Post Increment: ++
-  - [Line 19] Bitwise NOT: ~
-  - [Line 23] Unary Plus: +
-  - [Line 23] Unary Minus: -
+  - [UNARY] Logical NOT: !
+  - [UNARY] Pre Increment: ++
+  - [UNARY] Subtraction: -
+  - [UNARY] Subtraction: -
+  - [UNARY] Post Increment: ++
+  - [UNARY] Bitwise NOT: ~
+  - [UNARY] Unary Plus: +
+  - [UNARY] Unary Minus: -
 
 Binary/Ternary Operators:
-  - [Line 2] Greater Than or Equal: >=
-  - [Line 2] Logical AND: &&
-  - [Line 2] Not Equal To: !=
-  - [Line 4] Assignment: =
-  - [Line 5] Less Than: <
-  - [Line 5] Logical OR: ||
-  - [Line 7] Assignment: =
-  - [Line 10] Assignment: =
-  - [Line 10] Assignment: =
-  - [Line 12] Assignment: =
-  - [Line 12] Subtraction: -
-  - [Line 12] Addition: +
-  - [Line 12] Subtraction: -
-  - [Line 15] Assignment: =
-  - [Line 15] Modulus: %
-  - [Line 16] Assignment: =
-  - [Line 16] Multiplication: *
-  - [Line 16] Addition: +
-  - [Line 17] Divide Assignment: /=
-  - [Line 19] Assignment: =
-  - [Line 19] Bitwise AND: &
-  - [Line 19] Bitwise XOR: ^
-  - [Line 19] Bitwise OR: |
-  - [Line 20] Assignment: =
-  - [Line 20] Left Shift: <<
-  - [Line 20] Right Shift: >>
-  - [Line 21] Add Assignment: +=
-  - [Line 21] Subtract Assignment: -=
-  - [Line 21] Multiply Assignment: *=
-  - [Line 21] Divide Assignment: /=
-  - [Line 21] Modulus Assignment: %=
-  - [Line 21] Left Shift Assignment: <<=
-  - [Line 21] Right Shift Assignment: >>=
-  - [Line 21] Bitwise AND Assignment: &=
-  - [Line 21] Bitwise OR Assignment: |=
-  - [Line 21] Bitwise XOR Assignment: ^=
-  - [Line 23] Assignment: =
-  - [Line 23] Multiplication: *
-  - [Line 24] Assignment: =
-  - [Line 24] Exponential: **
-  - [Line 25] Assignment: =
-  - [Line 25] Equal To: ==
-  - [Line 25] Ternary Question Mark (Conditional): ?
-  - [Line 25] Ternary Colon: :
-  - [Line 27] Greater Than: >
+  - [BINARY] Greater Than or Equal: >=
+  - [BINARY] Logical AND: &&
+  - [BINARY] Not Equal To: !=
+  - [BINARY] Assignment: =
+  - [BINARY] Less Than: <
+  - [BINARY] Logical OR: ||
+  - [BINARY] Assignment: =
+  - [BINARY] Assignment: =
+  - [BINARY] Assignment: =
+  - [BINARY] Assignment: =
+  - [BINARY] Addition: +
+  - [BINARY] Assignment: =
+  - [BINARY] Modulus: %
+  - [BINARY] Assignment: =
+  - [BINARY] Multiplication: *
+  - [BINARY] Addition: +
+  - [BINARY] Divide Assignment: /=
+  - [BINARY] Assignment: =
+  - [BINARY] Bitwise AND: &
+  - [BINARY] Bitwise XOR: ^
+  - [BINARY] Bitwise OR: |
+  - [BINARY] Assignment: =
+  - [BINARY] Left Shift: <<
+  - [BINARY] Right Shift: >>
+  - [BINARY] Add Assignment: +=
+  - [BINARY] Subtract Assignment: -=
+  - [BINARY] Multiply Assignment: *=
+  - [BINARY] Divide Assignment: /=
+  - [BINARY] Modulus Assignment: %=
+  - [BINARY] Left Shift Assignment: <<=
+  - [BINARY] Right Shift Assignment: >>=
+  - [BINARY] Bitwise AND Assignment: &=
+  - [BINARY] Bitwise OR Assignment: |=
+  - [BINARY] Bitwise XOR Assignment: ^=
+  - [BINARY] Assignment: =
+  - [BINARY] Multiplication: *
+  - [BINARY] Exponential: **
+  - [BINARY] Assignment: =
+  - [BINARY] Equal To: ==
+  - [BINARY] Ternary Question Mark: ?
+  - [BINARY] Ternary Colon: :
+  - [BINARY] Greater Than: >
