@@ -180,3 +180,62 @@ int yywrap()
 {
     return 1;
 }
+[24bcs052@mepcolinux compiler]$cd ex3
+[24bcs052@mepcolinux ex3]$gcc lex.yy.c -o scanner
+[24bcs052@mepcolinux ex3]$./scanner
+--- OPERATOR ANALYSIS SUMMARY ---
+
+Unary Operators:
+  - [Line 5] Logical NOT: !
+  - [Line 11] Pre Increment: ++
+  - [Line 13] Post Increment: ++
+  - [Line 19] Bitwise NOT: ~
+  - [Line 23] Unary Plus: +
+  - [Line 23] Unary Minus: -
+
+Binary/Ternary Operators:
+  - [Line 2] Greater Than or Equal: >=
+  - [Line 2] Logical AND: &&
+  - [Line 2] Not Equal To: !=
+  - [Line 4] Assignment: =
+  - [Line 5] Less Than: <
+  - [Line 5] Logical OR: ||
+  - [Line 7] Assignment: =
+  - [Line 10] Assignment: =
+  - [Line 10] Assignment: =
+  - [Line 12] Assignment: =
+  - [Line 12] Subtraction: -
+  - [Line 12] Addition: +
+  - [Line 12] Subtraction: -
+  - [Line 15] Assignment: =
+  - [Line 15] Modulus: %
+  - [Line 16] Assignment: =
+  - [Line 16] Multiplication: *
+  - [Line 16] Addition: +
+  - [Line 17] Divide Assignment: /=
+  - [Line 19] Assignment: =
+  - [Line 19] Bitwise AND: &
+  - [Line 19] Bitwise XOR: ^
+  - [Line 19] Bitwise OR: |
+  - [Line 20] Assignment: =
+  - [Line 20] Left Shift: <<
+  - [Line 20] Right Shift: >>
+  - [Line 21] Add Assignment: +=
+  - [Line 21] Subtract Assignment: -=
+  - [Line 21] Multiply Assignment: *=
+  - [Line 21] Divide Assignment: /=
+  - [Line 21] Modulus Assignment: %=
+  - [Line 21] Left Shift Assignment: <<=
+  - [Line 21] Right Shift Assignment: >>=
+  - [Line 21] Bitwise AND Assignment: &=
+  - [Line 21] Bitwise OR Assignment: |=
+  - [Line 21] Bitwise XOR Assignment: ^=
+  - [Line 23] Assignment: =
+  - [Line 23] Multiplication: *
+  - [Line 24] Assignment: =
+  - [Line 24] Exponential: **
+  - [Line 25] Assignment: =
+  - [Line 25] Equal To: ==
+  - [Line 25] Ternary Question Mark (Conditional): ?
+  - [Line 25] Ternary Colon: :
+  - [Line 27] Greater Than: >
