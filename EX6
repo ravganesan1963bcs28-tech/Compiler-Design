@@ -1,0 +1,458 @@
+
+#include <stdio.h>
+#include <string.h>
+
+int q = 1, t = 1;
+
+void quad(char *op, char *a, char *b, char *r)
+{
+    printf("%d\t%s\t%s\t%s\t%s\n", q++, op, a, b, r);
+}
+
+void statement(char *s)
+{
+    char l[20], a[20], b[20], tmp[10];
+
+    s[strcspn(s, ";\n")] = 0;
+
+    if (strchr(s, '+'))
+    {
+        sscanf(s, "%[^=]=%[^+]+%s", l, a, b);
+        sprintf(tmp, "T%d", t++);
+        quad("+", a, b, tmp);
+        quad("=", tmp, "-", l);
+    }
+    else if (strchr(s, '-'))
+    {
+        sscanf(s, "%[^=]=%[^-]-%s", l, a, b);
+        sprintf(tmp, "T%d", t++);
+        quad("-", a, b, tmp);
+        quad("=", tmp, "-", l);
+    }
+    else if (strchr(s, '*'))
+    {
+        sscanf(s, "%[^=]=%[^*]*%s", l, a, b);
+        sprintf(tmp, "T%d", t++);
+        quad("*", a, b, tmp);
+        quad("=", tmp, "-", l);
+    }
+    else if (strchr(s, '/'))
+    {
+        sscanf(s, "%[^=]=%[^/]%*c%s", l, a, b);
+        sprintf(tmp, "T%d", t++);
+        quad("/", a, b, tmp);
+        quad("=", tmp, "-", l);
+    }
+    else
+    {
+        sscanf(s, "%[^=]=%s", l, a);
+        quad("=", a, "-", l);
+    }
+}
+
+int main()
+{
+    FILE *fp = fopen("input.txt", "r");
+    char line[100], f[100], init[30], cond[30], inc[30];
+    char a[20], b[20], l[20], tmp[10];
+
+    if (!fp)
+    {
+        printf("File not found\n");
+        return 1;
+    }
+
+    fgets(f, sizeof(f), fp);
+
+    sscanf(f, "for(%[^;];%[^;];%[^)])", init, cond, inc);
+
+    printf("No\tOp\tArg1\tArg2\tResult\n");
+
+    /* Initialization */
+    sscanf(init, "%[^=]=%s", l, a);
+    quad("=", a, "-", l);
+
+    /* Condition */
+    if (strstr(cond, "<="))
+        sscanf(cond, "%[^<]<=%s", a, b), strcpy(tmp, "<=");
+    else if (strstr(cond, ">="))
+        sscanf(cond, "%[^>] >=%s", a, b), strcpy(tmp, ">=");
+    else if (strchr(cond, '<'))
+        sscanf(cond, "%[^<]<%s", a, b), strcpy(tmp, "<");
+    else
+        sscanf(cond, "%[^>]>%s", a, b), strcpy(tmp, ">");
+
+    {
+        char tname[10];
+        sprintf(tname, "T%d", t++);
+        quad(tmp, a, b, tname);
+        quad("IF_FALSE", tname, "-", "L1");
+    }
+
+    /* Body: any number of lines */
+    while (fgets(line, sizeof(line), fp))
+    {
+        if (strchr(line, '}'))
+            break;
+
+        if (!strchr(line, '{') && strlen(line) > 1)
+            statement(line);
+    }
+
+    /* Increment */
+    sscanf(inc, "%[^=]=%[^+]+%s", l, a, b);
+    sprintf(tmp, "T%d", t++);
+    quad("+", a, b, tmp);
+    quad("=", tmp, "-", l);
+
+    quad("GOTO", "-", "-", "2");
+    quad("LABEL", "-", "-", "L1");
+
+    fclose(fp);
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int tempNo = 1;
+int quadNo = 1;
+
+/* Remove spaces and newline */
+void removeSpaces(char *s)
+{
+    int i, j = 0;
+    char temp[200];
+
+    for (i = 0; s[i] != '\0'; i++)
+    {
+        if (!isspace(s[i]))
+            temp[j++] = s[i];
+    }
+
+    temp[j] = '\0';
+    strcpy(s, temp);
+}
+
+/* Generate quadruple */
+void printQuad(char *op, char *arg1, char *arg2, char *result)
+{
+    printf("%d\t%-10s\t%-10s\t%-10s\t%-10s\n",
+           quadNo++, op, arg1, arg2, result);
+}
+
+/* Generate quadruple for assignment/expression */
+void processStatement(char *stmt)
+{
+    char lhs[30], rhs[100];
+    char arg1[30], arg2[30];
+    char op[5];
+    char temp[20];
+
+    int i, pos = -1;
+
+    /* Remove semicolon */
+    stmt[strcspn(stmt, ";")] = '\0';
+
+    /* Find = */
+    for (i = 0; stmt[i] != '\0'; i++)
+    {
+        if (stmt[i] == '=')
+        {
+            pos = i;
+            break;
+        }
+    }
+
+    if (pos == -1)
+        return;
+
+    /* Get left side */
+    strncpy(lhs, stmt, pos);
+    lhs[pos] = '\0';
+
+    /* Get right side */
+    strcpy(rhs, stmt + pos + 1);
+
+    /*
+       Check arithmetic operators.
+       We process one binary operation at a time.
+    */
+
+    if (strchr(rhs, '+'))
+    {
+        sscanf(rhs, "%[^+]+%s", arg1, arg2);
+
+        sprintf(temp, "T%d", tempNo++);
+        printQuad("+", arg1, arg2, temp);
+        printQuad("=", temp, "-", lhs);
+    }
+    else if (strchr(rhs, '*'))
+    {
+        sscanf(rhs, "%[^*]*%s", arg1, arg2);
+
+        sprintf(temp, "T%d", tempNo++);
+        printQuad("*", arg1, arg2, temp);
+        printQuad("=", temp, "-", lhs);
+    }
+    else if (strchr(rhs, '/'))
+    {
+        sscanf(rhs, "%[^/]%*c%s", arg1, arg2);
+
+        sprintf(temp, "T%d", tempNo++);
+        printQuad("/", arg1, arg2, temp);
+        printQuad("=", temp, "-", lhs);
+    }
+    else if (strchr(rhs, '%'))
+    {
+        sscanf(rhs, "%%%*c%s", arg2);
+
+        sprintf(temp, "T%d", tempNo++);
+        printQuad("%", arg1, arg2, temp);
+        printQuad("=", temp, "-", lhs);
+    }
+    else if (strchr(rhs, '-'))
+    {
+        sscanf(rhs, "%[^-]-%s", arg1, arg2);
+
+        sprintf(temp, "T%d", tempNo++);
+        printQuad("-", arg1, arg2, temp);
+        printQuad("=", temp, "-", lhs);
+    }
+    else
+    {
+        /* Simple assignment */
+        printQuad("=", rhs, "-", lhs);
+    }
+}
+
+int main()
+{
+    FILE *fp;
+
+    char line[200];
+    char forLine[200];
+
+    char init[50];
+    char condition[50];
+    char increment[50];
+
+    char lhs[30], rhs[30];
+    char arg1[30], arg2[30];
+    char temp[20];
+
+    char operator[5];
+
+    int i;
+    int equalPos;
+
+    fp = fopen("input.txt", "r");
+
+    if (fp == NULL)
+    {
+        printf("Error: Cannot open input.txt\n");
+        return 1;
+    }
+
+    /* Read the for statement */
+    fgets(forLine, sizeof(forLine), fp);
+
+    removeSpaces(forLine);
+
+    /*
+       Extract:
+       initialization
+       condition
+       increment
+    */
+    sscanf(forLine,
+           "for(%[^;];%[^;];%[^)])",
+           init, condition, increment);
+
+    printf("\nQUADRUPLES\n");
+    printf("-------------------------------------------------------------\n");
+    printf("No\tOperator\tArg1\t\tArg2\t\tResult\n");
+    printf("-------------------------------------------------------------\n");
+
+    /* -------------------------------------------------
+       INITIALIZATION
+       Example: i=0
+       ------------------------------------------------- */
+
+    equalPos = -1;
+
+    for (i = 0; init[i] != '\0'; i++)
+    {
+        if (init[i] == '=')
+        {
+            equalPos = i;
+            break;
+        }
+    }
+
+    if (equalPos != -1)
+    {
+        strncpy(lhs, init, equalPos);
+        lhs[equalPos] = '\0';
+
+        strcpy(rhs, init + equalPos + 1);
+
+        printQuad("=", rhs, "-", lhs);
+    }
+
+    /* -------------------------------------------------
+       CONDITION
+       Example: i<10
+       ------------------------------------------------- */
+
+    if (strstr(condition, "<="))
+        strcpy(operator, "<=");
+    else if (strstr(condition, ">="))
+        strcpy(operator, ">=");
+    else if (strstr(condition, "=="))
+        strcpy(operator, "==");
+    else if (strstr(condition, "!="))
+        strcpy(operator, "!=");
+    else if (strchr(condition, '<'))
+        strcpy(operator, "<");
+    else if (strchr(condition, '>'))
+        strcpy(operator, ">");
+    else
+        strcpy(operator, "?");
+
+    /* Find operator position */
+    equalPos = -1;
+
+    for (i = 0; condition[i] != '\0'; i++)
+    {
+        if (condition[i] == '<' ||
+            condition[i] == '>')
+        {
+            equalPos = i;
+            break;
+        }
+
+        if (condition[i] == '=' || condition[i] == '!')
+        {
+            equalPos = i;
+            break;
+        }
+    }
+
+    if (equalPos != -1)
+    {
+        strncpy(arg1, condition, equalPos);
+        arg1[equalPos] = '\0';
+
+        strcpy(arg2, condition + equalPos +
+               strlen(operator));
+
+        sprintf(temp, "T%d", tempNo++);
+
+        printQuad(operator, arg1, arg2, temp);
+
+        printQuad("IF_FALSE", temp, "-", "L1");
+    }
+
+    /* -------------------------------------------------
+       BODY OF FOR LOOP
+       Read multiple lines until }
+       ------------------------------------------------- */
+
+    while (fgets(line, sizeof(line), fp))
+    {
+        removeSpaces(line);
+
+        /* Stop when closing brace is found */
+        if (strchr(line, '}'))
+            break;
+
+        /* Ignore opening brace */
+        if (strchr(line, '{'))
+            continue;
+
+        /* Ignore empty lines */
+        if (strlen(line) == 0)
+            continue;
+
+        /*
+           Process every statement inside
+           the for loop.
+        */
+        processStatement(line);
+    }
+
+    /* -------------------------------------------------
+       INCREMENT
+       Example: i=i+1
+       ------------------------------------------------- */
+
+    equalPos = -1;
+
+    for (i = 0; increment[i] != '\0'; i++)
+    {
+        if (increment[i] == '=')
+        {
+            equalPos = i;
+            break;
+        }
+    }
+
+    if (equalPos != -1)
+    {
+        strncpy(lhs, increment, equalPos);
+        lhs[equalPos] = '\0';
+
+        strcpy(rhs, increment + equalPos + 1);
+
+        if (strchr(rhs, '+'))
+        {
+            sscanf(rhs, "%[^+]+%s", arg1, arg2);
+
+            sprintf(temp, "T%d", tempNo++);
+
+            printQuad("+", arg1, arg2, temp);
+            printQuad("=", temp, "-", lhs);
+        }
+        else if (strchr(rhs, '-'))
+        {
+            sscanf(rhs, "%[^-]-%s", arg1, arg2);
+
+            sprintf(temp, "T%d", tempNo++);
+
+            printQuad("-", arg1, arg2, temp);
+            printQuad("=", temp, "-", lhs);
+        }
+        else
+        {
+            printQuad("=", rhs, "-", lhs);
+        }
+    }
+
+    /* -------------------------------------------------
+       GOTO
+       Go back to condition
+       ------------------------------------------------- */
+
+    printQuad("GOTO", "-", "-", "2");
+
+    /* Loop exit label */
+    printQuad("LABEL", "-", "-", "L1");
+
+    fclose(fp);
+
+    return 0;
+}
+
+
+
