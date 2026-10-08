@@ -108,6 +108,20 @@ void yyerror(const char *s)
 {
     fprintf(stderr, "Error: %s\n", s);
 }
+Enter an expression:
+2^3+4*5
+Result = 28
+The expression is VALID.
+
+(10+4-2*3)/5/6
+Result = 0.266667
+The expression is VALID.
+
+2^^3
+Error: syntax error
+The expression is NOT VALID.
+
+
 
 int main()
 {
